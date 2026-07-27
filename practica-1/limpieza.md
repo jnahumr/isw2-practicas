@@ -51,3 +51,49 @@ export function AuthProvider({ children }) {
 | 3 | **Magic String** | `.from('usuarios')` | El nombre de la tabla está escrito literalmente. Si se renombra, el fallo aparece en tiempo de ejecución y no al compilar, y hay que buscarlo archivo por archivo. |
 
 ---
+
+## Versión refactorizada
+
+```jsx
+const TABLA_USUARIOS = 'usuarios'
+const CAMPOS_PERFIL  = 'id, nombre, rol, almacen_id, activo'
+
+export function AuthProvider({ children }) {
+  const [user, setUser]       = useState(null)
+  const [perfil, setPerfil]   = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError]     = useState(null)
+
+  async function cargarPerfil(userId) {
+    const { data, error } = await supabase
+      .from(TABLA_USUARIOS)
+      .select(CAMPOS_PERFIL)
+      .eq('id', userId)
+      .single()
+
+    if (error) {
+      console.error('Error al cargar el perfil:', error)
+      setError('No se pudo cargar tu perfil. Intentá de nuevo.')
+      return
+    }
+    setPerfil(data)
+  }
+
+  useEffect(() => {
+    async function iniciarSesion() {
+      const { data: { session } } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
+      if (session?.user) await cargarPerfil(session.user.id)
+      setLoading(false)
+    }
+    iniciarSesion()
+  }, [])
+}
+---
+
+### Mejoras generales obtenidas
+
+- **Legibilidad:** el flujo se lee de arriba hacia abajo en lugar de saltar entre un `.then()` y una función suelta.
+- **Depurabilidad:** los errores dejan de ser silenciosos, que era el defecto más grave del original.
+- **Seguridad:** la proyección explícita evita exponer columnas no previstas.
+- **Mantenibilidad:** las constantes concentran en un punto lo que antes estaba disperso como literales.
