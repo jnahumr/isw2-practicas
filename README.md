@@ -25,3 +25,6 @@ de cada cambio.
 ├── README.md
 └── practica-1/
     └── limpieza.md
+
+
+## Sobre la Práctica 2
