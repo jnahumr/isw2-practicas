@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { registrarCredenciales } = require('../src/auth');
+const { registrarCredenciales, AUTH_KEY } = require('../src/auth');
 
 function crearStorageFake() {
   const datos = {};
@@ -20,7 +20,7 @@ test('RF12: registrarCredenciales guarda usuario y hash cuando no hay credencial
 
   // Assert
   assert.equal(resultado.ok, true);
-  const guardado = JSON.parse(storage.getItem('citas_medicas_auth'));
+  const guardado = JSON.parse(storage.getItem(AUTH_KEY));
   assert.equal(guardado.usuario, 'admin');
   assert.ok(guardado.passwordHash, 'debe guardar un hash de la contraseña');
   assert.notEqual(guardado.passwordHash, 'clave123', 'la contraseña no debe guardarse en texto plano');
@@ -30,7 +30,7 @@ test('RF12: registrarCredenciales no sobrescribe si ya hay credenciales guardada
   // Arrange
   const storage = crearStorageFake();
   await registrarCredenciales(storage, 'admin', 'clave123');
-  const guardadoOriginal = storage.getItem('citas_medicas_auth');
+  const guardadoOriginal = storage.getItem(AUTH_KEY);
 
   // Act
   const resultado = await registrarCredenciales(storage, 'otro', 'otraClave');
@@ -38,5 +38,5 @@ test('RF12: registrarCredenciales no sobrescribe si ya hay credenciales guardada
   // Assert
   assert.equal(resultado.ok, false);
   assert.equal(resultado.error, 'ya-existen-credenciales');
-  assert.equal(storage.getItem('citas_medicas_auth'), guardadoOriginal);
+  assert.equal(storage.getItem(AUTH_KEY), guardadoOriginal);
 });
