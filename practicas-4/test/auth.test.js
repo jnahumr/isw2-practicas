@@ -25,3 +25,18 @@ test('RF12: registrarCredenciales guarda usuario y hash cuando no hay credencial
   assert.ok(guardado.passwordHash, 'debe guardar un hash de la contraseña');
   assert.notEqual(guardado.passwordHash, 'clave123', 'la contraseña no debe guardarse en texto plano');
 });
+
+test('RF12: registrarCredenciales no sobrescribe si ya hay credenciales guardadas', async () => {
+  // Arrange
+  const storage = crearStorageFake();
+  await registrarCredenciales(storage, 'admin', 'clave123');
+  const guardadoOriginal = storage.getItem('citas_medicas_auth');
+
+  // Act
+  const resultado = await registrarCredenciales(storage, 'otro', 'otraClave');
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.equal(resultado.error, 'ya-existen-credenciales');
+  assert.equal(storage.getItem('citas_medicas_auth'), guardadoOriginal);
+});
