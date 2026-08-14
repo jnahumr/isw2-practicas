@@ -9,6 +9,9 @@ async function hashPassword(password) {
 }
 
 async function registrarCredenciales(storage, usuario, password) {
+  if (storage.getItem(AUTH_KEY) !== null) {
+    return { ok: false, error: 'ya-existen-credenciales' };
+  }
   const passwordHash = await hashPassword(password);
   storage.setItem(AUTH_KEY, JSON.stringify({ usuario, passwordHash }));
   return { ok: true };
