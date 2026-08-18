@@ -1,21 +1,11 @@
+const CAMPOS_OBLIGATORIOS = ['paciente', 'medico', 'fecha', 'hora'];
+
 function generarId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function crearCita(datos) {
-  const errores = [];
-  if (!datos.paciente) {
-    errores.push('paciente');
-  }
-  if (!datos.medico) {
-    errores.push('medico');
-  }
-  if (!datos.fecha) {
-    errores.push('fecha');
-  }
-  if (!datos.hora) {
-    errores.push('hora');
-  }
+  const errores = CAMPOS_OBLIGATORIOS.filter((campo) => !datos[campo]);
   if (errores.length > 0) {
     return { ok: false, errores };
   }
