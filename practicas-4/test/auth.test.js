@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { registrarCredenciales, iniciarSesion, AUTH_KEY } = require('../src/auth');
+const { registrarCredenciales, iniciarSesion, haySesionActiva, cerrarSesion, AUTH_KEY } = require('../src/auth');
 
 function crearStorageFake() {
   const datos = {};
@@ -64,4 +64,16 @@ test('RF14: iniciarSesion rechaza el acceso y reporta error cuando la contraseñ
   // Assert
   assert.equal(resultado.ok, false);
   assert.equal(resultado.error, 'credenciales-invalidas');
+});
+
+test('RF15 (preparación): iniciarSesion exitoso marca una sesión activa', async () => {
+  // Arrange
+  const storage = crearStorageFake();
+  await registrarCredenciales(storage, 'admin', 'clave123');
+
+  // Act
+  await iniciarSesion(storage, 'admin', 'clave123');
+
+  // Assert
+  assert.equal(haySesionActiva(storage), true);
 });
