@@ -27,3 +27,22 @@ test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   assert.equal(resultado.cita.estado, 'pendiente');
   assert.ok(resultado.cita.id, 'debe generar un id único');
 });
+
+test('RF02: crearCita rechaza la creación si falta el paciente', () => {
+  // Arrange
+  const datos = {
+    paciente: '',
+    medico: 'Dra. López',
+    especialidad: 'Medicina General',
+    fecha: '2026-08-20',
+    hora: '10:30',
+    motivo: 'Consulta de rutina',
+  };
+
+  // Act
+  const resultado = crearCita(datos);
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.deepEqual(resultado.errores, ['paciente']);
+});
