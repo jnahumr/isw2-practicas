@@ -4,13 +4,17 @@ function generarId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function fechaHoraDe(fecha, hora) {
+  return new Date(`${fecha}T${hora}`);
+}
+
 function crearCita(datos, ahora = new Date(), citasExistentes = []) {
   const errores = CAMPOS_OBLIGATORIOS.filter((campo) => !datos[campo]);
   if (errores.length > 0) {
     return { ok: false, errores };
   }
 
-  const fechaHoraCita = new Date(`${datos.fecha}T${datos.hora}`);
+  const fechaHoraCita = fechaHoraDe(datos.fecha, datos.hora);
   if (fechaHoraCita < ahora) {
     return { ok: false, errores: ['fecha-pasada'] };
   }
@@ -80,7 +84,7 @@ function calcularEstadoVisual(cita, ahora = new Date()) {
   if (cita.fecha === fechaLocalISO(ahora)) {
     return 'hoy';
   }
-  const fechaHoraCita = new Date(`${cita.fecha}T${cita.hora}`);
+  const fechaHoraCita = fechaHoraDe(cita.fecha, cita.hora);
   return fechaHoraCita < ahora ? 'pasada' : 'proxima';
 }
 
