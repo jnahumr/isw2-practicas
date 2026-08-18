@@ -66,4 +66,22 @@ function cancelarCita(citas, id) {
   return editarCita(citas, id, { estado: 'cancelada' });
 }
 
-module.exports = { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita };
+function fechaLocalISO(date) {
+  const year = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, '0');
+  const dia = String(date.getDate()).padStart(2, '0');
+  return `${year}-${mes}-${dia}`;
+}
+
+function calcularEstadoVisual(cita, ahora = new Date()) {
+  if (cita.estado === 'cancelada') {
+    return 'cancelada';
+  }
+  if (cita.fecha === fechaLocalISO(ahora)) {
+    return 'hoy';
+  }
+  const fechaHoraCita = new Date(`${cita.fecha}T${cita.hora}`);
+  return fechaHoraCita < ahora ? 'pasada' : 'proxima';
+}
+
+module.exports = { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita, calcularEstadoVisual };
