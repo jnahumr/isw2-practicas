@@ -38,6 +38,10 @@ function haySesionActiva(storage) {
   return storage.getItem(SESSION_KEY) === '1';
 }
 
+function cerrarSesion(storage) {
+  storage.removeItem(SESSION_KEY);
+}
+
 module.exports = {
   AUTH_KEY,
   SESSION_KEY,
@@ -45,4 +49,5 @@ module.exports = {
   registrarCredenciales,
   iniciarSesion,
   haySesionActiva,
+  cerrarSesion,
 };
