@@ -46,3 +46,22 @@ test('RF02: crearCita rechaza la creación si falta el paciente', () => {
   assert.equal(resultado.ok, false);
   assert.deepEqual(resultado.errores, ['paciente']);
 });
+
+test('RF02: crearCita rechaza la creación si falta el médico', () => {
+  // Arrange
+  const datos = {
+    paciente: 'Juan Pérez',
+    medico: '',
+    especialidad: 'Medicina General',
+    fecha: '2026-08-20',
+    hora: '10:30',
+    motivo: 'Consulta de rutina',
+  };
+
+  // Act
+  const resultado = crearCita(datos);
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.deepEqual(resultado.errores, ['medico']);
+});
