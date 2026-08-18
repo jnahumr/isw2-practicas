@@ -26,7 +26,7 @@ async function iniciarSesion(storage, usuario, password) {
   const guardado = leerCredenciales(storage);
   const passwordHash = await hashPassword(password);
   const coincide = guardado.usuario === usuario && guardado.passwordHash === passwordHash;
-  return coincide ? { ok: true } : { ok: false };
+  return coincide ? { ok: true } : { ok: false, error: 'credenciales-invalidas' };
 }
 
 module.exports = { AUTH_KEY, hashPassword, registrarCredenciales, iniciarSesion };
