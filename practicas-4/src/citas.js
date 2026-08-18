@@ -62,4 +62,8 @@ function editarCita(citas, id, cambios) {
   return { ok: true, citas: citasActualizadas };
 }
 
-module.exports = { crearCita, ordenarCitas, filtrarCitas, editarCita };
+function cancelarCita(citas, id) {
+  return editarCita(citas, id, { estado: 'cancelada' });
+}
+
+module.exports = { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita };
