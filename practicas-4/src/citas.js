@@ -3,6 +3,14 @@ function generarId() {
 }
 
 function crearCita(datos) {
+  const errores = [];
+  if (!datos.paciente) {
+    errores.push('paciente');
+  }
+  if (errores.length > 0) {
+    return { ok: false, errores };
+  }
+
   const cita = {
     id: generarId(),
     paciente: datos.paciente,
