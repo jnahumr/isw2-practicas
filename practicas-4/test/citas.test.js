@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearCita, ordenarCitas } = require('../src/citas');
+const { crearCita, ordenarCitas, filtrarCitas } = require('../src/citas');
 
 test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   // Arrange
@@ -167,4 +167,46 @@ test('RF05: ordenarCitas ordena las citas por fecha y hora ascendente', () => {
 
   // Assert
   assert.deepEqual(resultado.map((cita) => cita.id), ['2', '3', '1']);
+});
+
+test('RF06: filtrarCitas encuentra coincidencias por nombre de paciente', () => {
+  // Arrange
+  const citas = [
+    { id: '1', paciente: 'Juan Pérez', medico: 'Dra. López', fecha: '2026-08-20' },
+    { id: '2', paciente: 'María Gómez', medico: 'Dr. Ruiz', fecha: '2026-08-21' },
+  ];
+
+  // Act
+  const resultado = filtrarCitas(citas, 'juan');
+
+  // Assert
+  assert.deepEqual(resultado.map((cita) => cita.id), ['1']);
+});
+
+test('RF06: filtrarCitas encuentra coincidencias por médico', () => {
+  // Arrange
+  const citas = [
+    { id: '1', paciente: 'Juan Pérez', medico: 'Dra. López', fecha: '2026-08-20' },
+    { id: '2', paciente: 'María Gómez', medico: 'Dr. Ruiz', fecha: '2026-08-21' },
+  ];
+
+  // Act
+  const resultado = filtrarCitas(citas, 'ruiz');
+
+  // Assert
+  assert.deepEqual(resultado.map((cita) => cita.id), ['2']);
+});
+
+test('RF06: filtrarCitas encuentra coincidencias por fecha', () => {
+  // Arrange
+  const citas = [
+    { id: '1', paciente: 'Juan Pérez', medico: 'Dra. López', fecha: '2026-08-20' },
+    { id: '2', paciente: 'María Gómez', medico: 'Dr. Ruiz', fecha: '2026-08-21' },
+  ];
+
+  // Act
+  const resultado = filtrarCitas(citas, '2026-08-21');
+
+  // Assert
+  assert.deepEqual(resultado.map((cita) => cita.id), ['2']);
 });
