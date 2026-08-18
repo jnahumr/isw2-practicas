@@ -43,4 +43,14 @@ function ordenarCitas(citas) {
   });
 }
 
-module.exports = { crearCita, ordenarCitas };
+function filtrarCitas(citas, texto) {
+  const busqueda = texto.toLowerCase();
+  return citas.filter(
+    (cita) =>
+      cita.paciente.toLowerCase().includes(busqueda) ||
+      cita.medico.toLowerCase().includes(busqueda) ||
+      cita.fecha.toLowerCase().includes(busqueda)
+  );
+}
+
+module.exports = { crearCita, ordenarCitas, filtrarCitas };
