@@ -17,4 +17,11 @@ async function registrarCredenciales(storage, usuario, password) {
   return { ok: true };
 }
 
-module.exports = { AUTH_KEY, hashPassword, registrarCredenciales };
+async function iniciarSesion(storage, usuario, password) {
+  const guardado = JSON.parse(storage.getItem(AUTH_KEY));
+  const passwordHash = await hashPassword(password);
+  const coincide = guardado.usuario === usuario && guardado.passwordHash === passwordHash;
+  return coincide ? { ok: true } : { ok: false };
+}
+
+module.exports = { AUTH_KEY, hashPassword, registrarCredenciales, iniciarSesion };
