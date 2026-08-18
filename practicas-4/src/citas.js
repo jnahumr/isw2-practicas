@@ -1,5 +1,14 @@
 const CAMPOS_OBLIGATORIOS = ['paciente', 'medico', 'fecha', 'hora'];
 
+const ESPECIALIDADES = [
+  'Medicina General',
+  'Pediatría',
+  'Odontología',
+  'Ginecología',
+  'Cardiología',
+  'Dermatología',
+];
+
 function generarId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
@@ -88,4 +97,12 @@ function calcularEstadoVisual(cita, ahora = new Date()) {
   return fechaHoraCita < ahora ? 'pasada' : 'proxima';
 }
 
-module.exports = { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita, calcularEstadoVisual };
+module.exports = {
+  crearCita,
+  ordenarCitas,
+  filtrarCitas,
+  editarCita,
+  cancelarCita,
+  calcularEstadoVisual,
+  ESPECIALIDADES,
+};
