@@ -1,4 +1,5 @@
 const AUTH_KEY = 'citas_medicas_auth';
+const SESSION_KEY = 'citas_medicas_sesion';
 
 async function hashPassword(password) {
   const datos = new TextEncoder().encode(password);
@@ -26,7 +27,22 @@ async function iniciarSesion(storage, usuario, password) {
   const guardado = leerCredenciales(storage);
   const passwordHash = await hashPassword(password);
   const coincide = guardado.usuario === usuario && guardado.passwordHash === passwordHash;
-  return coincide ? { ok: true } : { ok: false, error: 'credenciales-invalidas' };
+  if (!coincide) {
+    return { ok: false, error: 'credenciales-invalidas' };
+  }
+  storage.setItem(SESSION_KEY, '1');
+  return { ok: true };
 }
 
-module.exports = { AUTH_KEY, hashPassword, registrarCredenciales, iniciarSesion };
+function haySesionActiva(storage) {
+  return storage.getItem(SESSION_KEY) === '1';
+}
+
+module.exports = {
+  AUTH_KEY,
+  SESSION_KEY,
+  hashPassword,
+  registrarCredenciales,
+  iniciarSesion,
+  haySesionActiva,
+};
