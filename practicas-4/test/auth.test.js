@@ -52,3 +52,16 @@ test('RF13: iniciarSesion permite el acceso cuando usuario y contraseña coincid
   // Assert
   assert.equal(resultado.ok, true);
 });
+
+test('RF14: iniciarSesion rechaza el acceso y reporta error cuando la contraseña no coincide', async () => {
+  // Arrange
+  const storage = crearStorageFake();
+  await registrarCredenciales(storage, 'admin', 'clave123');
+
+  // Act
+  const resultado = await iniciarSesion(storage, 'admin', 'claveIncorrecta');
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.equal(resultado.error, 'credenciales-invalidas');
+});
