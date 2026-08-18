@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearCita } = require('../src/citas');
+const { crearCita, ordenarCitas } = require('../src/citas');
 
 test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   // Arrange
@@ -152,4 +152,19 @@ test('RF04: crearCita rechaza si ya existe una cita con el mismo médico, fecha 
   // Assert
   assert.equal(resultado.ok, false);
   assert.deepEqual(resultado.errores, ['solapamiento']);
+});
+
+test('RF05: ordenarCitas ordena las citas por fecha y hora ascendente', () => {
+  // Arrange
+  const citas = [
+    { id: '1', fecha: '2026-08-20', hora: '10:00' },
+    { id: '2', fecha: '2026-08-19', hora: '09:00' },
+    { id: '3', fecha: '2026-08-20', hora: '08:00' },
+  ];
+
+  // Act
+  const resultado = ordenarCitas(citas);
+
+  // Assert
+  assert.deepEqual(resultado.map((cita) => cita.id), ['2', '3', '1']);
 });
