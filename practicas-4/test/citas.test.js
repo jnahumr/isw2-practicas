@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita } = require('../src/citas');
+const { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita, calcularEstadoVisual } = require('../src/citas');
 
 test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   // Arrange
@@ -259,6 +259,54 @@ test('RF08: cancelarCita retorna error si el id no existe', () => {
   // Assert
   assert.equal(resultado.ok, false);
   assert.equal(resultado.error, 'cita-no-encontrada');
+});
+
+test('RF09: calcularEstadoVisual retorna "cancelada" si la cita fue cancelada', () => {
+  // Arrange
+  const ahora = new Date('2026-08-20T09:00:00');
+  const cita = { fecha: '2026-08-25', hora: '10:00', estado: 'cancelada' };
+
+  // Act
+  const resultado = calcularEstadoVisual(cita, ahora);
+
+  // Assert
+  assert.equal(resultado, 'cancelada');
+});
+
+test('RF09: calcularEstadoVisual retorna "hoy" si la fecha coincide con la fecha actual', () => {
+  // Arrange
+  const ahora = new Date('2026-08-20T09:00:00');
+  const cita = { fecha: '2026-08-20', hora: '15:00', estado: 'pendiente' };
+
+  // Act
+  const resultado = calcularEstadoVisual(cita, ahora);
+
+  // Assert
+  assert.equal(resultado, 'hoy');
+});
+
+test('RF09: calcularEstadoVisual retorna "pasada" si la fecha/hora ya transcurrió', () => {
+  // Arrange
+  const ahora = new Date('2026-08-20T09:00:00');
+  const cita = { fecha: '2026-08-18', hora: '10:00', estado: 'pendiente' };
+
+  // Act
+  const resultado = calcularEstadoVisual(cita, ahora);
+
+  // Assert
+  assert.equal(resultado, 'pasada');
+});
+
+test('RF09: calcularEstadoVisual retorna "proxima" si la fecha es futura', () => {
+  // Arrange
+  const ahora = new Date('2026-08-20T09:00:00');
+  const cita = { fecha: '2026-08-25', hora: '10:00', estado: 'pendiente' };
+
+  // Act
+  const resultado = calcularEstadoVisual(cita, ahora);
+
+  // Assert
+  assert.equal(resultado, 'proxima');
 });
 
 test('RF06: filtrarCitas encuentra coincidencias por fecha', () => {
