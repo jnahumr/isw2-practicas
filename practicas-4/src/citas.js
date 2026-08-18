@@ -35,4 +35,12 @@ function crearCita(datos, ahora = new Date(), citasExistentes = []) {
   return { ok: true, cita };
 }
 
-module.exports = { crearCita };
+function ordenarCitas(citas) {
+  return [...citas].sort((a, b) => {
+    const fechaHoraA = `${a.fecha}T${a.hora}`;
+    const fechaHoraB = `${b.fecha}T${b.hora}`;
+    return fechaHoraA.localeCompare(fechaHoraB);
+  });
+}
+
+module.exports = { crearCita, ordenarCitas };
