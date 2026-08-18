@@ -84,3 +84,22 @@ test('RF02: crearCita rechaza la creación si falta la fecha', () => {
   assert.equal(resultado.ok, false);
   assert.deepEqual(resultado.errores, ['fecha']);
 });
+
+test('RF02: crearCita rechaza la creación si falta la hora', () => {
+  // Arrange
+  const datos = {
+    paciente: 'Juan Pérez',
+    medico: 'Dra. López',
+    especialidad: 'Medicina General',
+    fecha: '2026-08-20',
+    hora: '',
+    motivo: 'Consulta de rutina',
+  };
+
+  // Act
+  const resultado = crearCita(datos);
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.deepEqual(resultado.errores, ['hora']);
+});
