@@ -53,4 +53,13 @@ function filtrarCitas(citas, texto) {
   );
 }
 
-module.exports = { crearCita, ordenarCitas, filtrarCitas };
+function editarCita(citas, id, cambios) {
+  const existe = citas.some((cita) => cita.id === id);
+  if (!existe) {
+    return { ok: false, error: 'cita-no-encontrada' };
+  }
+  const citasActualizadas = citas.map((cita) => (cita.id === id ? { ...cita, ...cambios } : cita));
+  return { ok: true, citas: citasActualizadas };
+}
+
+module.exports = { crearCita, ordenarCitas, filtrarCitas, editarCita };
