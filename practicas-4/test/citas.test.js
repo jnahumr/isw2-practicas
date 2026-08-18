@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearCita, ordenarCitas, filtrarCitas, editarCita } = require('../src/citas');
+const { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita } = require('../src/citas');
 
 test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   // Arrange
@@ -225,6 +225,36 @@ test('RF07: editarCita retorna error si el id no existe', () => {
 
   // Act
   const resultado = editarCita(citas, 'no-existe', { hora: '15:00' });
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.equal(resultado.error, 'cita-no-encontrada');
+});
+
+test('RF08: cancelarCita cambia el estado de la cita indicada a cancelada', () => {
+  // Arrange
+  const citas = [
+    { id: '1', paciente: 'Juan Pérez', estado: 'pendiente' },
+    { id: '2', paciente: 'María Gómez', estado: 'pendiente' },
+  ];
+
+  // Act
+  const resultado = cancelarCita(citas, '1');
+
+  // Assert
+  assert.equal(resultado.ok, true);
+  const citaCancelada = resultado.citas.find((cita) => cita.id === '1');
+  assert.equal(citaCancelada.estado, 'cancelada');
+  const otraCita = resultado.citas.find((cita) => cita.id === '2');
+  assert.equal(otraCita.estado, 'pendiente');
+});
+
+test('RF08: cancelarCita retorna error si el id no existe', () => {
+  // Arrange
+  const citas = [{ id: '1', paciente: 'Juan Pérez', estado: 'pendiente' }];
+
+  // Act
+  const resultado = cancelarCita(citas, 'no-existe');
 
   // Assert
   assert.equal(resultado.ok, false);
