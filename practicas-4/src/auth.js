@@ -8,8 +8,13 @@ async function hashPassword(password) {
     .join('');
 }
 
+function leerCredenciales(storage) {
+  const guardado = storage.getItem(AUTH_KEY);
+  return guardado === null ? null : JSON.parse(guardado);
+}
+
 async function registrarCredenciales(storage, usuario, password) {
-  if (storage.getItem(AUTH_KEY) !== null) {
+  if (leerCredenciales(storage) !== null) {
     return { ok: false, error: 'ya-existen-credenciales' };
   }
   const passwordHash = await hashPassword(password);
@@ -18,7 +23,7 @@ async function registrarCredenciales(storage, usuario, password) {
 }
 
 async function iniciarSesion(storage, usuario, password) {
-  const guardado = JSON.parse(storage.getItem(AUTH_KEY));
+  const guardado = leerCredenciales(storage);
   const passwordHash = await hashPassword(password);
   const coincide = guardado.usuario === usuario && guardado.passwordHash === passwordHash;
   return coincide ? { ok: true } : { ok: false };
