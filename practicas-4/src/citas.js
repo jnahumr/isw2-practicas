@@ -13,6 +13,9 @@ function crearCita(datos) {
   if (!datos.fecha) {
     errores.push('fecha');
   }
+  if (!datos.hora) {
+    errores.push('hora');
+  }
   if (errores.length > 0) {
     return { ok: false, errores };
   }
