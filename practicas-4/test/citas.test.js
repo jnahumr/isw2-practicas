@@ -103,3 +103,23 @@ test('RF02: crearCita rechaza la creación si falta la hora', () => {
   assert.equal(resultado.ok, false);
   assert.deepEqual(resultado.errores, ['hora']);
 });
+
+test('RF03: crearCita rechaza la creación si la fecha/hora ya pasó', () => {
+  // Arrange
+  const ahora = new Date('2026-08-20T12:00:00');
+  const datos = {
+    paciente: 'Juan Pérez',
+    medico: 'Dra. López',
+    especialidad: 'Medicina General',
+    fecha: '2026-08-20',
+    hora: '10:30',
+    motivo: 'Consulta de rutina',
+  };
+
+  // Act
+  const resultado = crearCita(datos, ahora);
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.deepEqual(resultado.errores, ['fecha-pasada']);
+});
