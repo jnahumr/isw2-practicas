@@ -9,6 +9,15 @@ const ESPECIALIDADES = [
   'Dermatología',
 ];
 
+const MEDICOS_POR_ESPECIALIDAD = {
+  'Medicina General': ['Dra. López', 'Dr. Luis Pérez'],
+  Pediatría: ['Dra. Carla Méndez', 'Dr. Jorge Ramírez'],
+  Odontología: ['Dra. Sofía Torres'],
+  Ginecología: ['Dra. Elena Castro'],
+  Cardiología: ['Dr. Miguel Ángel Rivas'],
+  Dermatología: ['Dra. Paula Navarro'],
+};
+
 function generarId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
@@ -33,6 +42,11 @@ function crearCita(datos, ahora = new Date(), citasExistentes = []) {
   );
   if (haySolapamiento) {
     return { ok: false, errores: ['solapamiento'] };
+  }
+
+  const medicosDeEspecialidad = MEDICOS_POR_ESPECIALIDAD[datos.especialidad] || [];
+  if (!medicosDeEspecialidad.includes(datos.medico)) {
+    return { ok: false, errores: ['medico-invalido'] };
   }
 
   const cita = {
@@ -105,4 +119,5 @@ module.exports = {
   cancelarCita,
   calcularEstadoVisual,
   ESPECIALIDADES,
+  MEDICOS_POR_ESPECIALIDAD,
 };
