@@ -1,6 +1,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearCita, ordenarCitas, filtrarCitas, editarCita, cancelarCita, calcularEstadoVisual } = require('../src/citas');
+const {
+  crearCita,
+  ordenarCitas,
+  filtrarCitas,
+  editarCita,
+  cancelarCita,
+  calcularEstadoVisual,
+  ESPECIALIDADES,
+} = require('../src/citas');
 
 test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   // Arrange
@@ -307,6 +315,18 @@ test('RF09: calcularEstadoVisual retorna "proxima" si la fecha es futura', () =>
 
   // Assert
   assert.equal(resultado, 'proxima');
+});
+
+test('RF11: ESPECIALIDADES ofrece una lista predefinida no vacía de especialidades médicas', () => {
+  // Arrange & Act
+  // (ESPECIALIDADES es una constante exportada, no requiere Act)
+
+  // Assert
+  assert.ok(Array.isArray(ESPECIALIDADES));
+  assert.ok(ESPECIALIDADES.length > 0);
+  assert.ok(ESPECIALIDADES.includes('Medicina General'));
+  assert.ok(ESPECIALIDADES.includes('Pediatría'));
+  assert.ok(ESPECIALIDADES.includes('Odontología'));
 });
 
 test('RF06: filtrarCitas encuentra coincidencias por fecha', () => {
