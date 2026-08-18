@@ -77,3 +77,16 @@ test('RF15 (preparación): iniciarSesion exitoso marca una sesión activa', asyn
   // Assert
   assert.equal(haySesionActiva(storage), true);
 });
+
+test('RF15: cerrarSesion finaliza la sesión activa', async () => {
+  // Arrange
+  const storage = crearStorageFake();
+  await registrarCredenciales(storage, 'admin', 'clave123');
+  await iniciarSesion(storage, 'admin', 'clave123');
+
+  // Act
+  cerrarSesion(storage);
+
+  // Assert
+  assert.equal(haySesionActiva(storage), false);
+});
