@@ -10,6 +10,9 @@ function crearCita(datos) {
   if (!datos.medico) {
     errores.push('medico');
   }
+  if (!datos.fecha) {
+    errores.push('fecha');
+  }
   if (errores.length > 0) {
     return { ok: false, errores };
   }
