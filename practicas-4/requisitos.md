@@ -24,7 +24,7 @@ Aplicación web **standalone** (un único archivo `.html` con HTML, CSS y JavaSc
 | RF08 | El usuario puede cancelar (eliminar) una cita, con confirmación previa. |
 | RF09 | El sistema muestra visualmente el estado de cada cita (ej. próxima, hoy, pasada/atendida, cancelada). |
 | RF10 | Las citas quedan guardadas en `localStorage` y se recargan automáticamente al abrir la aplicación. |
-| RF11 | El usuario puede seleccionar el médico/especialidad de una lista predefinida (ej. Medicina General, Pediatría, Odontología, etc.). |
+| RF11 | El usuario primero selecciona la especialidad de una lista predefinida (ej. Medicina General, Pediatría, Odontología, etc.) y luego selecciona el médico de una lista predefinida de médicos que pertenecen a esa especialidad. |
 | RF12 | Si no hay credenciales guardadas, el sistema permite configurar un usuario y contraseña la primera vez que se abre la aplicación. |
 | RF13 | El usuario debe iniciar sesión con el usuario y contraseña configurados antes de acceder a la gestión de citas. |
 | RF14 | Si las credenciales ingresadas no coinciden con las guardadas, el sistema muestra un mensaje de error y no otorga acceso. |
@@ -45,6 +45,7 @@ Aplicación web **standalone** (un único archivo `.html` con HTML, CSS y JavaSc
 
 - No se permite crear una cita en una fecha/hora ya pasada.
 - No se permite doble reserva: mismo médico + misma fecha + misma hora.
+- El médico seleccionado debe pertenecer a la especialidad seleccionada; si no, la cita se rechaza.
 - Al cancelar una cita, se debe pedir confirmación al usuario antes de eliminarla definitivamente.
 - Una cita se considera "hoy" si su fecha coincide con la fecha actual del sistema.
 - Una cita se considera "pasada" si su fecha/hora ya transcurrió y no fue cancelada.

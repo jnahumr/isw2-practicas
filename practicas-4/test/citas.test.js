@@ -8,6 +8,7 @@ const {
   cancelarCita,
   calcularEstadoVisual,
   ESPECIALIDADES,
+  MEDICOS_POR_ESPECIALIDAD,
 } = require('../src/citas');
 
 test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
@@ -327,6 +328,26 @@ test('RF11: ESPECIALIDADES ofrece una lista predefinida no vacía de especialida
   assert.ok(ESPECIALIDADES.includes('Medicina General'));
   assert.ok(ESPECIALIDADES.includes('Pediatría'));
   assert.ok(ESPECIALIDADES.includes('Odontología'));
+});
+
+test('RF11: crearCita rechaza la creación si el médico no pertenece a la especialidad seleccionada', () => {
+  // Arrange
+  const ahora = new Date('2026-08-18T08:00:00');
+  const datos = {
+    paciente: 'Juan Pérez',
+    medico: 'Dr. Alguien Inventado',
+    especialidad: 'Medicina General',
+    fecha: '2026-08-25',
+    hora: '10:00',
+    motivo: 'Consulta de rutina',
+  };
+
+  // Act
+  const resultado = crearCita(datos, ahora);
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.deepEqual(resultado.errores, ['medico-invalido']);
 });
 
 test('RF06: filtrarCitas encuentra coincidencias por fecha', () => {
