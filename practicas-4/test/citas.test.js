@@ -123,3 +123,33 @@ test('RF03: crearCita rechaza la creación si la fecha/hora ya pasó', () => {
   assert.equal(resultado.ok, false);
   assert.deepEqual(resultado.errores, ['fecha-pasada']);
 });
+
+test('RF04: crearCita rechaza si ya existe una cita con el mismo médico, fecha y hora', () => {
+  // Arrange
+  const ahora = new Date('2026-08-18T08:00:00');
+  const citaExistente = {
+    id: '1',
+    paciente: 'Otro Paciente',
+    medico: 'Dra. López',
+    especialidad: 'Medicina General',
+    fecha: '2026-08-20',
+    hora: '10:30',
+    motivo: 'Chequeo',
+    estado: 'pendiente',
+  };
+  const datos = {
+    paciente: 'Juan Pérez',
+    medico: 'Dra. López',
+    especialidad: 'Medicina General',
+    fecha: '2026-08-20',
+    hora: '10:30',
+    motivo: 'Consulta de rutina',
+  };
+
+  // Act
+  const resultado = crearCita(datos, ahora, [citaExistente]);
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.deepEqual(resultado.errores, ['solapamiento']);
+});
