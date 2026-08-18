@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { registrarCredenciales, AUTH_KEY } = require('../src/auth');
+const { registrarCredenciales, iniciarSesion, AUTH_KEY } = require('../src/auth');
 
 function crearStorageFake() {
   const datos = {};
@@ -39,4 +39,16 @@ test('RF12: registrarCredenciales no sobrescribe si ya hay credenciales guardada
   assert.equal(resultado.ok, false);
   assert.equal(resultado.error, 'ya-existen-credenciales');
   assert.equal(storage.getItem(AUTH_KEY), guardadoOriginal);
+});
+
+test('RF13: iniciarSesion permite el acceso cuando usuario y contraseña coinciden', async () => {
+  // Arrange
+  const storage = crearStorageFake();
+  await registrarCredenciales(storage, 'admin', 'clave123');
+
+  // Act
+  const resultado = await iniciarSesion(storage, 'admin', 'clave123');
+
+  // Assert
+  assert.equal(resultado.ok, true);
 });
