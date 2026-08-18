@@ -7,6 +7,9 @@ function crearCita(datos) {
   if (!datos.paciente) {
     errores.push('paciente');
   }
+  if (!datos.medico) {
+    errores.push('medico');
+  }
   if (errores.length > 0) {
     return { ok: false, errores };
   }
