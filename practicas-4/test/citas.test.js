@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearCita, ordenarCitas, filtrarCitas } = require('../src/citas');
+const { crearCita, ordenarCitas, filtrarCitas, editarCita } = require('../src/citas');
 
 test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   // Arrange
@@ -195,6 +195,40 @@ test('RF06: filtrarCitas encuentra coincidencias por médico', () => {
 
   // Assert
   assert.deepEqual(resultado.map((cita) => cita.id), ['2']);
+});
+
+test('RF07: editarCita actualiza los campos indicados de la cita con el id dado', () => {
+  // Arrange
+  const citas = [
+    { id: '1', paciente: 'Juan Pérez', medico: 'Dra. López', fecha: '2026-08-20', hora: '10:00', estado: 'pendiente' },
+    { id: '2', paciente: 'María Gómez', medico: 'Dr. Ruiz', fecha: '2026-08-21', hora: '11:00', estado: 'pendiente' },
+  ];
+
+  // Act
+  const resultado = editarCita(citas, '1', { hora: '15:00', motivo: 'Cambio de horario' });
+
+  // Assert
+  assert.equal(resultado.ok, true);
+  const citaEditada = resultado.citas.find((cita) => cita.id === '1');
+  assert.equal(citaEditada.hora, '15:00');
+  assert.equal(citaEditada.motivo, 'Cambio de horario');
+  assert.equal(citaEditada.paciente, 'Juan Pérez');
+  const otraCita = resultado.citas.find((cita) => cita.id === '2');
+  assert.equal(otraCita.hora, '11:00');
+});
+
+test('RF07: editarCita retorna error si el id no existe', () => {
+  // Arrange
+  const citas = [
+    { id: '1', paciente: 'Juan Pérez', medico: 'Dra. López', fecha: '2026-08-20', hora: '10:00', estado: 'pendiente' },
+  ];
+
+  // Act
+  const resultado = editarCita(citas, 'no-existe', { hora: '15:00' });
+
+  // Assert
+  assert.equal(resultado.ok, false);
+  assert.equal(resultado.error, 'cita-no-encontrada');
 });
 
 test('RF06: filtrarCitas encuentra coincidencias por fecha', () => {
