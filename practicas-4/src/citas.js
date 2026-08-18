@@ -4,7 +4,7 @@ function generarId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-function crearCita(datos, ahora = new Date()) {
+function crearCita(datos, ahora = new Date(), citasExistentes = []) {
   const errores = CAMPOS_OBLIGATORIOS.filter((campo) => !datos[campo]);
   if (errores.length > 0) {
     return { ok: false, errores };
@@ -13,6 +13,13 @@ function crearCita(datos, ahora = new Date()) {
   const fechaHoraCita = new Date(`${datos.fecha}T${datos.hora}`);
   if (fechaHoraCita < ahora) {
     return { ok: false, errores: ['fecha-pasada'] };
+  }
+
+  const haySolapamiento = citasExistentes.some(
+    (cita) => cita.medico === datos.medico && cita.fecha === datos.fecha && cita.hora === datos.hora
+  );
+  if (haySolapamiento) {
+    return { ok: false, errores: ['solapamiento'] };
   }
 
   const cita = {
