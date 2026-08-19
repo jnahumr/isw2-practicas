@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citas Médicas</title>
+<style>
+  :root {
+    --azul: #2563eb;
+    --azul-oscuro: #1d4ed8;
+    --verde: #16a34a;
+    --rojo: #dc2626;
+    --gris-texto: #1f2937;
+    --gris-suave: #6b7280;
+    --fondo: #f3f4f6;
+    --borde: #d1d5db;
+    --blanco: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--fondo);
+    color: var(--gris-texto);
+  }
+
+  .contenedor {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .contenedor-angosto {
+    max-width: 420px;
+    margin: 48px auto;
+    padding: 16px;
+  }
+
+  .tarjeta {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 0 0 16px; }
+  p.subtitulo { color: var(--gris-suave); margin: 0 0 20px; font-size: 0.9rem; }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    margin-top: 12px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .fila-campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0 12px;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 9px 16px;
+    font-family: inherit;
+  }
+
+  .boton-primario { background: var(--azul); color: var(--blanco); }
+  .boton-primario:hover { background: var(--azul-oscuro); }
+  .boton-secundario { background: var(--borde); color: var(--gris-texto); }
+  .boton-peligro { background: #fee2e2; color: var(--rojo); }
+  .boton-peligro:hover { background: #fecaca; }
+  .boton-enlace { background: none; color: var(--azul); padding: 4px 6px; }
+
+  .acciones-formulario { margin-top: 18px; display: flex; gap: 8px; }
+
+  .errores {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: var(--rojo);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+  }
+
+  .errores ul { margin: 4px 0 0; padding-left: 18px; }
+
+  .encabezado-app {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .barra-busqueda { margin: 20px 0 12px; }
+
+  .lista-citas { overflow-x: auto; margin-top: 12px; }
+
+  table { width: 100%; border-collapse: collapse; min-width: 720px; }
+
+  th, td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--borde);
+    font-size: 0.88rem;
+    vertical-align: top;
+  }
+
+  th { color: var(--gris-suave); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; }
+
+  .estado-etiqueta {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .estado-proxima { background: #dbeafe; color: #1d4ed8; }
+  .estado-hoy { background: #dcfce7; color: #15803d; }
+  .estado-pasada { background: #f3f4f6; color: #6b7280; }
+  .estado-cancelada { background: #fee2e2; color: #b91c1c; }
+
+  .sin-citas { color: var(--gris-suave); padding: 20px 0; text-align: center; }
+
+  .acciones-fila { display: flex; gap: 6px; flex-wrap: wrap; }
+  .acciones-fila button { padding: 5px 10px; font-size: 0.8rem; }
+
+  .oculto { display: none !important; }
+
+  @media (max-width: 640px) {
+    .encabezado-app { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+
+<div id="vista-configuracion" class="contenedor-angosto oculto">
+  <div class="tarjeta">
+    <h1>Configurar acceso</h1>
+    <p class="subtitulo">Primera vez que abres la aplicación. Crea un usuario y contraseña para proteger tus citas (se guardan solo en este navegador).</p>
+    <form id="formulario-configuracion">
+      <label for="config-usuario">Usuario</label>
+      <input type="text" id="config-usuario" required>
+      <label for="config-password">Contraseña</label>
+      <input type="password" id="config-password" required minlength="4">
+      <div class="acciones-formulario">
+        <button type="submit" class="boton-primario">Crear acceso</button>
+      </div>
+      <div id="errores-configuracion" class="errores oculto"></div>
+    </form>
+  </div>
+</div>
+
+<div id="vista-login" class="contenedor-angosto oculto">
+  <div class="tarjeta">
+    <h1>Iniciar sesión</h1>
+    <p class="subtitulo">Citas Médicas</p>
+    <form id="formulario-login">
+      <label for="login-usuario">Usuario</label>
+      <input type="text" id="login-usuario" required>
+      <label for="login-password">Contraseña</label>
+      <input type="password" id="login-password" required>
+      <div class="acciones-formulario">
+        <button type="submit" class="boton-primario">Entrar</button>
+      </div>
+      <div id="errores-login" class="errores oculto"></div>
+    </form>
+  </div>
+</div>
+
+<div id="vista-app" class="contenedor oculto">
+  <div class="encabezado-app">
+    <div>
+      <h1>Citas Médicas</h1>
+      <p class="subtitulo" style="margin:0">Gestión de citas — datos guardados en este navegador</p>
+    </div>
+    <button id="boton-cerrar-sesion" class="boton-secundario">Cerrar sesión</button>
+  </div>
+
+  <div class="tarjeta">
+    <h2 id="titulo-formulario-cita">Nueva cita</h2>
+    <form id="formulario-cita">
+      <input type="hidden" id="cita-id">
+      <div class="fila-campos">
+        <div>
+          <label for="cita-paciente">Paciente</label>
+          <input type="text" id="cita-paciente">
+        </div>
+        <div>
+          <label for="cita-especialidad">Especialidad</label>
+          <select id="cita-especialidad"></select>
+        </div>
+      </div>
+      <div class="fila-campos">
+        <div>
+          <label for="cita-medico">Médico</label>
+          <select id="cita-medico" disabled></select>
+        </div>
+        <div>
+          <label for="cita-fecha">Fecha</label>
+          <input type="date" id="cita-fecha">
+        </div>
+        <div>
+          <label for="cita-hora">Hora</label>
+          <input type="time" id="cita-hora">
+        </div>
+      </div>
+      <label for="cita-motivo">Motivo de consulta</label>
+      <textarea id="cita-motivo"></textarea>
+      <div class="acciones-formulario">
+        <button type="submit" id="boton-guardar-cita" class="boton-primario">Agendar cita</button>
+        <button type="button" id="boton-cancelar-edicion" class="boton-secundario oculto">Cancelar edición</button>
+      </div>
+      <div id="errores-cita" class="errores oculto"></div>
+    </form>
+  </div>
+
+  <div class="barra-busqueda">
+    <label for="cita-busqueda">Buscar por paciente, médico o fecha</label>
+    <input type="text" id="cita-busqueda" placeholder="Ej. Juan Pérez, Dra. López, 2026-08-20">
+  </div>
+
+  <div class="lista-citas">
+    <table>
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Especialidad</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpo-tabla-citas"></tbody>
+    </table>
+    <p id="mensaje-sin-citas" class="sin-citas oculto">No hay citas registradas todavía.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- src/auth.js (lógica de login, sin backend) ----------
+
+  const AUTH_KEY = 'citas_medicas_auth';
+  const SESSION_KEY = 'citas_medicas_sesion';
+
+  async function hashPassword(password) {
+    const datos = new TextEncoder().encode(password);
+    const buffer = await crypto.subtle.digest('SHA-256', datos);
+    return Array.from(new Uint8Array(buffer))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function leerCredenciales(storage) {
+    const guardado = storage.getItem(AUTH_KEY);
+    return guardado === null ? null : JSON.parse(guardado);
+  }
+
+  async function registrarCredenciales(storage, usuario, password) {
+    if (leerCredenciales(storage) !== null) {
+      return { ok: false, error: 'ya-existen-credenciales' };
+    }
+    const passwordHash = await hashPassword(password);
+    storage.setItem(AUTH_KEY, JSON.stringify({ usuario, passwordHash }));
+    return { ok: true };
+  }
+
+  async function iniciarSesion(storage, usuario, password) {
+    const guardado = leerCredenciales(storage);
+    const passwordHash = await hashPassword(password);
+    const coincide = guardado.usuario === usuario && guardado.passwordHash === passwordHash;
+    if (!coincide) {
+      return { ok: false, error: 'credenciales-invalidas' };
+    }
+    storage.setItem(SESSION_KEY, '1');
+    return { ok: true };
+  }
+
+  function haySesionActiva(storage) {
+    return storage.getItem(SESSION_KEY) === '1';
+  }
+
+  function cerrarSesion(storage) {
+    storage.removeItem(SESSION_KEY);
+  }
+
+  // ---------- src/citas.js (lógica de citas) ----------
+
+  const CAMPOS_OBLIGATORIOS = ['paciente', 'medico', 'fecha', 'hora'];
+
+  const ESPECIALIDADES = [
+    'Medicina General',
+    'Pediatría',
+    'Odontología',
+    'Ginecología',
+    'Cardiología',
+    'Dermatología',
+  ];
+
+  const MEDICOS_POR_ESPECIALIDAD = {
+    'Medicina General': ['Dra. López', 'Dr. Luis Pérez'],
+    Pediatría: ['Dra. Carla Méndez', 'Dr. Jorge Ramírez'],
+    Odontología: ['Dra. Sofía Torres'],
+    Ginecología: ['Dra. Elena Castro'],
+    Cardiología: ['Dr. Miguel Ángel Rivas'],
+    Dermatología: ['Dra. Paula Navarro'],
+  };
+
+  function generarId() {
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  function fechaHoraDe(fecha, hora) {
+    return new Date(`${fecha}T${hora}`);
+  }
+
+  function crearCita(datos, ahora = new Date(), citasExistentes = []) {
+    const errores = CAMPOS_OBLIGATORIOS.filter((campo) => !datos[campo]);
+    if (errores.length > 0) {
+      return { ok: false, errores };
+    }
+
+    const fechaHoraCita = fechaHoraDe(datos.fecha, datos.hora);
+    if (fechaHoraCita < ahora) {
+      return { ok: false, errores: ['fecha-pasada'] };
+    }
+
+    const haySolapamiento = citasExistentes.some(
+      (cita) => cita.medico === datos.medico && cita.fecha === datos.fecha && cita.hora === datos.hora
+    );
+    if (haySolapamiento) {
+      return { ok: false, errores: ['solapamiento'] };
+    }
+
+    const medicosDeEspecialidad = MEDICOS_POR_ESPECIALIDAD[datos.especialidad] || [];
+    if (!medicosDeEspecialidad.includes(datos.medico)) {
+      return { ok: false, errores: ['medico-invalido'] };
+    }
+
+    const cita = {
+      id: generarId(),
+      paciente: datos.paciente,
+      medico: datos.medico,
+      especialidad: datos.especialidad,
+      fecha: datos.fecha,
+      hora: datos.hora,
+      motivo: datos.motivo,
+      estado: 'pendiente',
+    };
+    return { ok: true, cita };
+  }
+
+  function ordenarCitas(citas) {
+    return [...citas].sort((a, b) => {
+      const fechaHoraA = `${a.fecha}T${a.hora}`;
+      const fechaHoraB = `${b.fecha}T${b.hora}`;
+      return fechaHoraA.localeCompare(fechaHoraB);
+    });
+  }
+
+  function filtrarCitas(citas, texto) {
+    const busqueda = texto.toLowerCase();
+    return citas.filter(
+      (cita) =>
+        cita.paciente.toLowerCase().includes(busqueda) ||
+        cita.medico.toLowerCase().includes(busqueda) ||
+        cita.fecha.toLowerCase().includes(busqueda)
+    );
+  }
+
+  function editarCita(citas, id, cambios) {
+    const existe = citas.some((cita) => cita.id === id);
+    if (!existe) {
+      return { ok: false, error: 'cita-no-encontrada' };
+    }
+    const citasActualizadas = citas.map((cita) => (cita.id === id ? { ...cita, ...cambios } : cita));
+    return { ok: true, citas: citasActualizadas };
+  }
+
+  function cancelarCita(citas, id) {
+    return editarCita(citas, id, { estado: 'cancelada' });
+  }
+
+  function fechaLocalISO(date) {
+    const year = date.getFullYear();
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const dia = String(date.getDate()).padStart(2, '0');
+    return `${year}-${mes}-${dia}`;
+  }
+
+  function calcularEstadoVisual(cita, ahora = new Date()) {
+    if (cita.estado === 'cancelada') {
+      return 'cancelada';
+    }
+    if (cita.fecha === fechaLocalISO(ahora)) {
+      return 'hoy';
+    }
+    const fechaHoraCita = fechaHoraDe(cita.fecha, cita.hora);
+    return fechaHoraCita < ahora ? 'pasada' : 'proxima';
+  }
+
+  // ---------- src/almacenamiento.js (persistencia) ----------
+
+  const CITAS_KEY = 'citas_medicas';
+
+  function guardarCitasEnStorage(storage, citas) {
+    storage.setItem(CITAS_KEY, JSON.stringify(citas));
+  }
+
+  function cargarCitasDeStorage(storage) {
+    const guardado = storage.getItem(CITAS_KEY);
+    return guardado === null ? [] : JSON.parse(guardado);
+  }
+
+  // ---------- Interfaz ----------
+
+  const MENSAJES_ERROR = {
+    paciente: 'El paciente es obligatorio.',
+    medico: 'El médico es obligatorio.',
+    fecha: 'La fecha es obligatoria.',
+    hora: 'La hora es obligatoria.',
+    'fecha-pasada': 'No se puede agendar una cita en una fecha/hora que ya pasó.',
+    solapamiento: 'Ya existe una cita con ese médico en esa misma fecha y hora.',
+    'medico-invalido': 'Selecciona un médico válido para la especialidad elegida.',
+    'credenciales-invalidas': 'Usuario o contraseña incorrectos.',
+  };
+
+  const ETIQUETAS_ESTADO = {
+    proxima: 'Próxima',
+    hoy: 'Hoy',
+    pasada: 'Atendida',
+    cancelada: 'Cancelada',
+  };
+
+  const estado = {
+    citas: [],
+    filtro: '',
+    editandoId: null,
+  };
+
+  const vistaConfiguracion = document.getElementById('vista-configuracion');
+  const vistaLogin = document.getElementById('vista-login');
+  const vistaApp = document.getElementById('vista-app');
+
+  const formularioConfiguracion = document.getElementById('formulario-configuracion');
+  const erroresConfiguracion = document.getElementById('errores-configuracion');
+
+  const formularioLogin = document.getElementById('formulario-login');
+  const erroresLogin = document.getElementById('errores-login');
+
+  const formularioCita = document.getElementById('formulario-cita');
+  const erroresCita = document.getElementById('errores-cita');
+  const tituloFormularioCita = document.getElementById('titulo-formulario-cita');
+  const botonGuardarCita = document.getElementById('boton-guardar-cita');
+  const botonCancelarEdicion = document.getElementById('boton-cancelar-edicion');
+  const campoBusqueda = document.getElementById('cita-busqueda');
+  const cuerpoTabla = document.getElementById('cuerpo-tabla-citas');
+  const mensajeSinCitas = document.getElementById('mensaje-sin-citas');
+  const selectEspecialidad = document.getElementById('cita-especialidad');
+  const selectMedico = document.getElementById('cita-medico');
+
+  function mostrarErrores(contenedor, codigos) {
+    if (!codigos || codigos.length === 0) {
+      contenedor.classList.add('oculto');
+      contenedor.innerHTML = '';
+      return;
+    }
+    const items = codigos.map((codigo) => `<li>${MENSAJES_ERROR[codigo] || codigo}</li>`).join('');
+    contenedor.innerHTML = `<strong>No se pudo continuar:</strong><ul>${items}</ul>`;
+    contenedor.classList.remove('oculto');
+  }
+
+  function poblarEspecialidades() {
+    selectEspecialidad.innerHTML =
+      '<option value="">Selecciona una especialidad</option>' +
+      ESPECIALIDADES.map((especialidad) => `<option value="${especialidad}">${especialidad}</option>`).join('');
+  }
+
+  function poblarMedicos(especialidad, medicoSeleccionado) {
+    const medicos = MEDICOS_POR_ESPECIALIDAD[especialidad] || [];
+    if (medicos.length === 0) {
+      selectMedico.innerHTML = '<option value="">Elige primero una especialidad</option>';
+      selectMedico.disabled = true;
+      return;
+    }
+    selectMedico.innerHTML =
+      '<option value="">Selecciona un médico</option>' +
+      medicos.map((medico) => `<option value="${medico}">${medico}</option>`).join('');
+    selectMedico.disabled = false;
+    if (medicoSeleccionado && medicos.includes(medicoSeleccionado)) {
+      selectMedico.value = medicoSeleccionado;
+    }
+  }
+
+  selectEspecialidad.addEventListener('change', () => {
+    poblarMedicos(selectEspecialidad.value);
+  });
+
+  async function mostrarVistaSegunEstado() {
+    vistaConfiguracion.classList.add('oculto');
+    vistaLogin.classList.add('oculto');
+    vistaApp.classList.add('oculto');
+
+    if (leerCredenciales(localStorage) === null) {
+      vistaConfiguracion.classList.remove('oculto');
+      return;
+    }
+    if (!haySesionActiva(localStorage)) {
+      vistaLogin.classList.remove('oculto');
+      return;
+    }
+    vistaApp.classList.remove('oculto');
+    estado.citas = cargarCitasDeStorage(localStorage);
+    renderizarListado();
+  }
+
+  formularioConfiguracion.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    const usuario = document.getElementById('config-usuario').value.trim();
+    const password = document.getElementById('config-password').value;
+    const resultado = await registrarCredenciales(localStorage, usuario, password);
+    if (!resultado.ok) {
+      mostrarErrores(erroresConfiguracion, [resultado.error]);
+      return;
+    }
+    mostrarErrores(erroresConfiguracion, []);
+    formularioConfiguracion.reset();
+    await mostrarVistaSegunEstado();
+  });
+
+  formularioLogin.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    const usuario = document.getElementById('login-usuario').value.trim();
+    const password = document.getElementById('login-password').value;
+    const resultado = await iniciarSesion(localStorage, usuario, password);
+    if (!resultado.ok) {
+      mostrarErrores(erroresLogin, [resultado.error]);
+      return;
+    }
+    mostrarErrores(erroresLogin, []);
+    formularioLogin.reset();
+    await mostrarVistaSegunEstado();
+  });
+
+  document.getElementById('boton-cerrar-sesion').addEventListener('click', () => {
+    cerrarSesion(localStorage);
+    mostrarVistaSegunEstado();
+  });
+
+  function limpiarFormularioCita() {
+    formularioCita.reset();
+    document.getElementById('cita-id').value = '';
+    poblarMedicos('');
+    estado.editandoId = null;
+    tituloFormularioCita.textContent = 'Nueva cita';
+    botonGuardarCita.textContent = 'Agendar cita';
+    botonCancelarEdicion.classList.add('oculto');
+    mostrarErrores(erroresCita, []);
+  }
+
+  botonCancelarEdicion.addEventListener('click', limpiarFormularioCita);
+
+  formularioCita.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    const datos = {
+      paciente: document.getElementById('cita-paciente').value.trim(),
+      medico: document.getElementById('cita-medico').value.trim(),
+      especialidad: document.getElementById('cita-especialidad').value,
+      fecha: document.getElementById('cita-fecha').value,
+      hora: document.getElementById('cita-hora').value,
+      motivo: document.getElementById('cita-motivo').value.trim(),
+    };
+
+    if (estado.editandoId) {
+      const otrasCitas = estado.citas.filter((cita) => cita.id !== estado.editandoId);
+      const resultadoCreacion = crearCita(datos, new Date(), otrasCitas);
+      if (!resultadoCreacion.ok) {
+        mostrarErrores(erroresCita, resultadoCreacion.errores);
+        return;
+      }
+      const resultadoEdicion = editarCita(estado.citas, estado.editandoId, datos);
+      estado.citas = resultadoEdicion.citas;
+    } else {
+      const resultado = crearCita(datos, new Date(), estado.citas);
+      if (!resultado.ok) {
+        mostrarErrores(erroresCita, resultado.errores);
+        return;
+      }
+      estado.citas = [...estado.citas, resultado.cita];
+    }
+
+    guardarCitasEnStorage(localStorage, estado.citas);
+    limpiarFormularioCita();
+    renderizarListado();
+  });
+
+  function iniciarEdicion(id) {
+    const cita = estado.citas.find((c) => c.id === id);
+    if (!cita) return;
+    estado.editandoId = id;
+    document.getElementById('cita-id').value = id;
+    document.getElementById('cita-paciente').value = cita.paciente;
+    document.getElementById('cita-especialidad').value = cita.especialidad || '';
+    poblarMedicos(cita.especialidad || '', cita.medico);
+    document.getElementById('cita-fecha').value = cita.fecha;
+    document.getElementById('cita-hora').value = cita.hora;
+    document.getElementById('cita-motivo').value = cita.motivo || '';
+    tituloFormularioCita.textContent = 'Editar cita';
+    botonGuardarCita.textContent = 'Guardar cambios';
+    botonCancelarEdicion.classList.remove('oculto');
+    mostrarErrores(erroresCita, []);
+    formularioCita.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelarCitaDesdeUI(id) {
+    const cita = estado.citas.find((c) => c.id === id);
+    if (!cita) return;
+    const confirmado = confirm(`¿Cancelar la cita de ${cita.paciente} el ${cita.fecha} ${cita.hora}?`);
+    if (!confirmado) return;
+    const resultado = cancelarCita(estado.citas, id);
+    if (resultado.ok) {
+      estado.citas = resultado.citas;
+      guardarCitasEnStorage(localStorage, estado.citas);
+      renderizarListado();
+    }
+  }
+
+  campoBusqueda.addEventListener('input', () => {
+    estado.filtro = campoBusqueda.value;
+    renderizarListado();
+  });
+
+  function renderizarListado() {
+    const citasFiltradas = estado.filtro ? filtrarCitas(estado.citas, estado.filtro) : estado.citas;
+    const citasOrdenadas = ordenarCitas(citasFiltradas);
+    const ahora = new Date();
+
+    if (citasOrdenadas.length === 0) {
+      cuerpoTabla.innerHTML = '';
+      mensajeSinCitas.classList.remove('oculto');
+      return;
+    }
+    mensajeSinCitas.classList.add('oculto');
+
+    cuerpoTabla.innerHTML = citasOrdenadas
+      .map((cita) => {
+        const estadoVisual = calcularEstadoVisual(cita, ahora);
+        const puedeGestionar = cita.estado !== 'cancelada';
+        return `
+          <tr>
+            <td>${escaparHtml(cita.paciente)}</td>
+            <td>${escaparHtml(cita.medico)}</td>
+            <td>${escaparHtml(cita.especialidad || '—')}</td>
+            <td>${cita.fecha}</td>
+            <td>${cita.hora}</td>
+            <td>${escaparHtml(cita.motivo || '—')}</td>
+            <td><span class="estado-etiqueta estado-${estadoVisual}">${ETIQUETAS_ESTADO[estadoVisual]}</span></td>
+            <td class="acciones-fila">
+              ${
+                puedeGestionar
+                  ? `<button type="button" class="boton-secundario" data-accion="editar" data-id="${cita.id}">Editar</button>
+                     <button type="button" class="boton-peligro" data-accion="cancelar" data-id="${cita.id}">Cancelar</button>`
+                  : ''
+              }
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
+  }
+
+  cuerpoTabla.addEventListener('click', (evento) => {
+    const boton = evento.target.closest('button[data-accion]');
+    if (!boton) return;
+    const { accion, id } = boton.dataset;
+    if (accion === 'editar') iniciarEdicion(id);
+    if (accion === 'cancelar') cancelarCitaDesdeUI(id);
+  });
+
+  function escaparHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+  }
+
+  document.getElementById('cita-fecha').min = fechaLocalISO(new Date());
+
+  poblarEspecialidades();
+  poblarMedicos('');
+  mostrarVistaSegunEstado();
+})();
+</script>
+</body>
+</html>
