@@ -15,6 +15,19 @@ function calcularDescuento(total, tipoCliente) {
     return 0;
 }
 
+function mostrarResumenVenta(resultado) {
+    console.log("Cliente: " + resultado.cliente);
+    console.log("Producto: " + resultado.producto);
+    console.log("Cantidad: " + resultado.cantidad);
+    console.log(
+        "Subtotal con descuento: " +
+        (resultado.total - resultado.impuesto)
+    );
+    console.log("Impuesto: " + resultado.impuesto);
+    console.log("Total: " + resultado.total);
+    console.log(resultado.mensaje);
+}
+
 function procesarVenta(cliente, producto, cantidad, precio, tipoCliente) {
     if (!cliente || !producto || cantidad <= 0 || precio <= 0) {
         return { error: "Datos incorrectos" };
@@ -37,15 +50,7 @@ function procesarVenta(cliente, producto, cantidad, precio, tipoCliente) {
         mensaje = "Venta normal";
     }
 
-    console.log("Cliente: " + cliente);
-    console.log("Producto: " + producto);
-    console.log("Cantidad: " + cantidad);
-    console.log("Subtotal con descuento: " + (total - impuesto));
-    console.log("Impuesto: " + impuesto);
-    console.log("Total: " + total);
-    console.log(mensaje);
-
-    return {
+    const resultado = {
         cliente: cliente,
         producto: producto,
         cantidad: cantidad,
@@ -54,6 +59,10 @@ function procesarVenta(cliente, producto, cantidad, precio, tipoCliente) {
         total: total,
         mensaje: mensaje
     };
+
+    mostrarResumenVenta(resultado);
+
+    return resultado;
 }
 
 module.exports = { procesarVenta };
