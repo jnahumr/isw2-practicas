@@ -1,3 +1,8 @@
+const DESCUENTO_VIP = 0.20;
+const DESCUENTO_FRECUENTE = 0.10;
+const TASA_IMPUESTO = 0.15;
+const LIMITE_VENTA_GRANDE = 5000;
+
 function procesarVenta(cliente, producto, cantidad, precio, tipoCliente) {
     if (!cliente || !producto || cantidad <= 0 || precio <= 0) {
         return { error: "Datos incorrectos" };
@@ -7,21 +12,21 @@ function procesarVenta(cliente, producto, cantidad, precio, tipoCliente) {
     let descuento = 0;
 
     if (tipoCliente === "VIP") {
-        descuento = total * 0.20;
+        descuento = total * DESCUENTO_VIP;
     } else if (tipoCliente === "FRECUENTE") {
-        descuento = total * 0.10;
+        descuento = total * DESCUENTO_FRECUENTE;
     } else if (tipoCliente === "NORMAL") {
         descuento = 0;
     }
 
     total = total - descuento;
 
-    let impuesto = total * 0.15;
+    let impuesto = total * TASA_IMPUESTO;
     total = total + impuesto;
 
     let mensaje = "";
 
-    if (total > 5000) {
+    if (total > LIMITE_VENTA_GRANDE) {
         mensaje = "Venta grande";
     } else {
         mensaje = "Venta normal";
