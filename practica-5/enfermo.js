@@ -3,16 +3,26 @@ const DESCUENTO_FRECUENTE = 0.10;
 const TASA_IMPUESTO = 0.15;
 const LIMITE_VENTA_GRANDE = 5000;
 
-function calcularDescuento(total, tipoCliente) {
+function calcularDescuento(subtotal, tipoCliente) {
     if (tipoCliente === "VIP") {
-        return total * DESCUENTO_VIP;
+        return subtotal * DESCUENTO_VIP;
     }
 
     if (tipoCliente === "FRECUENTE") {
-        return total * DESCUENTO_FRECUENTE;
+        return subtotal * DESCUENTO_FRECUENTE;
     }
 
     return 0;
+}
+
+function calcularImpuesto(subtotalConDescuento) {
+    return subtotalConDescuento * TASA_IMPUESTO;
+}
+
+function clasificarVenta(total) {
+    return total > LIMITE_VENTA_GRANDE
+        ? "Venta grande"
+        : "Venta normal";
 }
 
 function mostrarResumenVenta(resultado) {
@@ -33,22 +43,12 @@ function procesarVenta(cliente, producto, cantidad, precio, tipoCliente) {
         return { error: "Datos incorrectos" };
     }
 
-    let total = cantidad * precio;
-
-    const descuento = calcularDescuento(total, tipoCliente);
-
-    total = total - descuento;
-
-    const impuesto = total * TASA_IMPUESTO;
-    total = total + impuesto;
-
-    let mensaje = "";
-
-    if (total > LIMITE_VENTA_GRANDE) {
-        mensaje = "Venta grande";
-    } else {
-        mensaje = "Venta normal";
-    }
+    const subtotal = cantidad * precio;
+    const descuento = calcularDescuento(subtotal, tipoCliente);
+    const subtotalConDescuento = subtotal - descuento;
+    const impuesto = calcularImpuesto(subtotalConDescuento);
+    const total = subtotalConDescuento + impuesto;
+    const mensaje = clasificarVenta(total);
 
     const resultado = {
         cliente: cliente,
