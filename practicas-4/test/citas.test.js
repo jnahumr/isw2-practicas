@@ -23,7 +23,8 @@ test('RF01: crearCita registra una nueva cita con los datos indicados', () => {
   };
 
   // Act
-  const resultado = crearCita(datos);
+  const ahora = new Date('2026-08-18T08:00:00');
+  const resultado = crearCita(datos, ahora);
 
   // Assert
   assert.equal(resultado.ok, true);
