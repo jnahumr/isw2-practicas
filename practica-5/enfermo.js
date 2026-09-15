@@ -1,16 +1,16 @@
-function procesarVenta(c, p, cant, precio, tipo) {
-    if (!c || !p || cant <= 0 || precio <= 0) {
+function procesarVenta(cliente, producto, cantidad, precio, tipoCliente) {
+    if (!cliente || !producto || cantidad <= 0 || precio <= 0) {
         return { error: "Datos incorrectos" };
     }
 
-    let total = cant * precio;
+    let total = cantidad * precio;
     let descuento = 0;
 
-    if (tipo === "VIP") {
+    if (tipoCliente === "VIP") {
         descuento = total * 0.20;
-    } else if (tipo === "FRECUENTE") {
+    } else if (tipoCliente === "FRECUENTE") {
         descuento = total * 0.10;
-    } else if (tipo === "NORMAL") {
+    } else if (tipoCliente === "NORMAL") {
         descuento = 0;
     }
 
@@ -27,18 +27,18 @@ function procesarVenta(c, p, cant, precio, tipo) {
         mensaje = "Venta normal";
     }
 
-    console.log("Cliente: " + c);
-    console.log("Producto: " + p);
-    console.log("Cantidad: " + cant);
+    console.log("Cliente: " + cliente);
+    console.log("Producto: " + producto);
+    console.log("Cantidad: " + cantidad);
     console.log("Subtotal con descuento: " + (total - impuesto));
     console.log("Impuesto: " + impuesto);
     console.log("Total: " + total);
     console.log(mensaje);
 
     return {
-        cliente: c,
-        producto: p,
-        cantidad: cant,
+        cliente: cliente,
+        producto: producto,
+        cantidad: cantidad,
         descuento: descuento,
         impuesto: impuesto,
         total: total,
