@@ -1,0 +1,24 @@
+name: CI - Practicas 4 y 5
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Ejecutar tests de Practica 4
+        run: node --test practicas-4/test/*.test.js
+
+      - name: Ejecutar tests de Practica 5
+        run: node --test practica-5/enfermo.test.js
